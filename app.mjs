@@ -1,10 +1,24 @@
 import express from 'express'
+import { connectDB } from './config/dbConfig.mjs'
+import superHeroRoutes from './routes/superHeroRoutes.mjs'
+
 
 const app = express()
-const PORT = 3000
+const PORT = process.env.PORT || 3000
 
-/* Rutas */
+/* Middleware para parsear JSON */
+app.use(express.json())
 
-app.get('/', (req, res) => res.send('Principal'))
+/* Conexión a MongoDB */
+connectDB()
 
-app.listen(PORT, () => console.log(`http://localhost:${PORT}`))
+/* Configuración de Rutas */
+app.use('/api', superHeroRoutes)
+
+/* Manejo de errores para rutas no encontradas */
+app.use((req, res) => {
+  res.status(404).send( {mensaje: 'Ruta no encontrada' })
+})
+
+
+app.listen(PORT, () => console.log(`Servidor escuchando en el puerto ${PORT}`))
